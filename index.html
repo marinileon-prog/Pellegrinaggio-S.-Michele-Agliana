@@ -122,7 +122,7 @@ body { background:var(--p); color:var(--b); font-family:'EB Garamond',serif; ove
 #submit-msg.err { color:var(--err); }
 
 /* ── ADMIN IMPORT ── */
-.admin-bar { max-width:640px; margin:0 auto; padding:16px; background:var(--c); border:1px dashed var(--os); display:none; align-items:center; gap:12px; flex-wrap:wrap; }
+.admin-bar { max-width:640px; margin:0 auto; padding:16px; background:var(--c); border:1px dashed var(--os); display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
 .admin-bar p { font-family:'Cinzel',serif; font-size:.58rem; letter-spacing:2px; text-transform:uppercase; color:var(--s); flex:1; }
 
 /* ═══════════════════════
@@ -590,7 +590,7 @@ footer { background:var(--dk); color:rgba(255,255,255,.4); text-align:center; pa
 </footer>
 
 <!-- ══════════════════════════════════════
-     SCRIPT — JSONBin condiviso
+     SCRIPT — 100% localStorage, nessun server
 ══════════════════════════════════════ -->
 <script>
 'use strict';
@@ -640,59 +640,36 @@ function verificaPin() {
 const JSONBIN_KEY = '$2a$10$/I6JiKtiRuJDDBxcCdVwSOIaIDL8zngWaIjIWdMM1ax2Fb5IVFM/y';
 const JSONBIN_BIN = '69bfdebdaa77b81da909e974';
 const MY_ID_KEY = 'sm_myid_22mar2026';
-if(!localStorage.getItem(MY_ID_KEY)){
-  localStorage.setItem(MY_ID_KEY,'id_'+Date.now()+'_'+Math.random().toString(36).slice(2,8));
-}
+if(!localStorage.getItem(MY_ID_KEY)){localStorage.setItem(MY_ID_KEY,'id_'+Date.now()+'_'+Math.random().toString(36).slice(2,8));}
 function getMioId(){ return localStorage.getItem(MY_ID_KEY); }
 
-// ─── ORGANIZZATORI ───
-var ORGS=[{n:'eleonora',c:'giovannelli'},{n:'chiara',c:'ricasoli'},{n:'leonardo',c:'marini'}];
-var ORG_KEY='sm_org_22mar2026';
-function isOrg(){ return localStorage.getItem(ORG_KEY)==='1'; }
-function checkOrg(nome,cogn){
-  var n=nome.toLowerCase().trim(),c=cogn.toLowerCase().trim();
-  for(var i=0;i<ORGS.length;i++){if(ORGS[i].n===n&&ORGS[i].c===c){localStorage.setItem(ORG_KEY,'1');showAdminBar();return;}}
-}
-function showAdminBar(){var b=document.querySelector('.admin-bar');if(b)b.style.display='flex';}
-
-// ─── JSONBIN ───
+// ─── LEGGI tutte le testimonianze ───
 async function leggiTutte() {
   try {
-    var res = await fetch('https://api.jsonbin.io/v3/b/'+JSONBIN_BIN+'/latest',
-      {headers:{'X-Master-Key':JSONBIN_KEY}});
-    var d = await res.json();
-    return d.record.testimonianze||[];
+    var res=await fetch('https://api.jsonbin.io/v3/b/'+JSONBIN_BIN+'/latest',{headers:{'X-Master-Key':JSONBIN_KEY}});
+    var d=await res.json(); return d.record.testimonianze||[];
   } catch(e){ return []; }
 }
+
+// ─── SALVA tutte le testimonianze ───
 async function salvaTutte(arr) {
-  await fetch('https://api.jsonbin.io/v3/b/'+JSONBIN_BIN,{
-    method:'PUT',
-    headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_KEY},
-    body:JSON.stringify({testimonianze:arr})
-  });
+  await fetch('https://api.jsonbin.io/v3/b/'+JSONBIN_BIN,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_KEY},body:JSON.stringify({testimonianze:arr})});
 }
 
-// ─── FOTO: bin separato JSONBin ───
+// ─── AGGIUNGI una testimonianza ───
 async function uploadFoto(base64) {
   try {
-    var res = await fetch('https://api.jsonbin.io/v3/b',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_KEY,'X-Bin-Private':'false'},
-      body:JSON.stringify({f:base64})
-    });
+    var res=await fetch('https://api.jsonbin.io/v3/b',{method:'POST',headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_KEY,'X-Bin-Private':'false'},body:JSON.stringify({f:base64})});
     if(!res.ok) return base64;
-    var d = await res.json();
-    return 'jb:'+d.metadata.id;
+    var d=await res.json(); return 'jb:'+d.metadata.id;
   } catch(e){ return base64; }
 }
 async function loadFoto(ref) {
   if(!ref) return null;
   if(!ref.startsWith('jb:')) return ref;
   try {
-    var res = await fetch('https://api.jsonbin.io/v3/b/'+ref.slice(3)+'/latest',
-      {headers:{'X-Master-Key':JSONBIN_KEY}});
-    var d = await res.json();
-    return d.record.f||null;
+    var res=await fetch('https://api.jsonbin.io/v3/b/'+ref.slice(3)+'/latest',{headers:{'X-Master-Key':JSONBIN_KEY}});
+    var d=await res.json(); return d.record.f||null;
   } catch(e){ return null; }
 }
 
@@ -737,39 +714,45 @@ async function anteprima(event) {
 
 // ─── INVIA TESTIMONIANZA ───
 async function inviaTestimonianza() {
-  if (statoSito() === 2) { alert('Raccolta chiusa.'); return; }
-  var nome = document.getElementById('inp-nome').value.trim();
-  var cogn = document.getElementById('inp-cogn').value.trim();
-  var testo = document.getElementById('inp-testo').value.trim();
-  var msg = document.getElementById('submit-msg');
-  var btn = document.getElementById('btn-submit');
-  if (!nome || !cogn || !testo) { mostraMsg(msg,'err','Compila tutti i campi'); return; }
+  if (statoSito() === 2) {
+    alert('Il periodo di raccolta testimonianze è terminato il 31 marzo 2026.');
+    return;
+  }
+  const nome  = document.getElementById('inp-nome').value.trim();
+  const cogn  = document.getElementById('inp-cogn').value.trim();
+  const testo = document.getElementById('inp-testo').value.trim();
+  const msg   = document.getElementById('submit-msg');
+  const btn   = document.getElementById('btn-submit');
+
+  if (!nome || !cogn || !testo) {
+    mostraMsg(msg, 'err', '✗ Compila tutti i campi obbligatori');
+    return;
+  }
+
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Salvataggio...';
+  btn.innerHTML = '<span class="spinner"></span> Salvataggio…';
+
   try {
-    var fotoRef = null;
-    if (fotoBase64) {
-      btn.innerHTML = '<span class="spinner"></span> Caricamento foto...';
-      fotoRef = await uploadFoto(fotoBase64);
-    }
-    var arr = await leggiTutte();
-    arr.push({id:getMioId()+'_'+Date.now(), deviceId:getMioId(), nome:nome, cogn:cogn, testo:testo, foto:fotoRef, timestamp:Date.now()});
+    var fotoRef=null;
+    if(fotoBase64){ btn.innerHTML='<span class="spinner"></span> Caricamento foto...'; fotoRef=await uploadFoto(fotoBase64); }
+    var arr=await leggiTutte();
+    arr.push({id:getMioId()+'_'+Date.now(),deviceId:getMioId(),nome:nome,cogn:cogn,testo:testo,foto:fotoRef,timestamp:Date.now()});
     await salvaTutte(arr);
-    checkOrg(nome, cogn);
-    mostraMsg(msg,'ok','Testimonianza salvata - grazie!');
-    document.getElementById('inp-nome').value='';
-    document.getElementById('inp-cogn').value='';
-    document.getElementById('inp-testo').value='';
-    document.getElementById('inp-foto').value='';
-    document.getElementById('preview-wrap').style.display='none';
-    fotoBase64=null;
+    mostraMsg(msg, 'ok', 'Testimonianza salvata - grazie!');
+    document.getElementById('inp-nome').value = '';
+    document.getElementById('inp-cogn').value = '';
+    document.getElementById('inp-testo').value = '';
+    document.getElementById('inp-foto').value = '';
+    document.getElementById('preview-wrap').style.display = 'none';
+    fotoBase64 = null;
     aggiornaTestimonianze();
   } catch(e) {
-    mostraMsg(msg,'err','Errore di rete. Riprova.');
+    mostraMsg(msg, 'err', '✗ Errore. Spazio disco pieno?');
     console.error(e);
   }
-  btn.disabled=false;
-  btn.innerHTML='&#10013; &nbsp; Invia la mia testimonianza';
+
+  btn.disabled = false;
+  btn.innerHTML = '✝ &nbsp; Invia la mia testimonianza';
 }
 
 function mostraMsg(el, tipo, testo) {
@@ -781,47 +764,38 @@ function mostraMsg(el, tipo, testo) {
 
 // ─── MOSTRA TESTIMONIANZE ───
 async function aggiornaTestimonianze() {
-  var grid = document.getElementById('test-grid');
-  var countEl = document.getElementById('test-count');
-  countEl.textContent = 'Caricamento...';
-  var list = await leggiTutte();
+  var grid=document.getElementById('test-grid');
+  var countEl=document.getElementById('test-count');
+  countEl.textContent='Caricamento...';
+  var list=await leggiTutte();
   list.sort(function(a,b){return a.timestamp-b.timestamp;});
+
   if (!list.length) {
-    countEl.textContent = '0 pellegrini - sii il primo!';
+    countEl.textContent = '0 pellegrini — sii il primo!';
     grid.innerHTML = '<p class="test-empty">Nessuna testimonianza ancora. Lascia la tua qui sopra!</p>';
     return;
   }
-  countEl.textContent = list.length + (list.length===1?' pellegrino ha':' pellegrini hanno') + ' condiviso la propria esperienza';
+
+  countEl.textContent = list.length + (list.length === 1 ? ' pellegrino ha' : ' pellegrini hanno') + ' condiviso la propria esperienza';
   grid.innerHTML = '';
-  var mioId = getMioId();
+  var mioId=getMioId();
   list.forEach(function(t) {
-    var ora = new Date(t.timestamp).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-    var card = document.createElement('div');
-    card.className = 'test-card';
-    var isMia = t.deviceId && t.deviceId===mioId;
-    var editBtn = isMia ? '<div style="margin-top:10px;"><button class="btn-gold btn-outline" style="font-size:.55rem;padding:5px 12px;margin-top:0;" onclick="modificaT('+JSON.stringify(t.id||String(t.timestamp))+')">&#9998; Modifica</button></div>' : '';
-    card.innerHTML = '<div class="test-nome">'+esc(t.nome)+' '+esc(t.cogn)+'</div>'
-      +'<div class="test-ora">&#128205; '+ora+' &middot; 22 marzo 2026</div>'
-      +'<div class="test-testo">'+esc(t.testo).replace(/\n/g,'<br>')+'</div>'
-      +editBtn;
-    if(t.foto){
-      var img=document.createElement('img');
-      img.className='test-foto'; img.alt='Foto'; img.loading='lazy';
-      card.appendChild(img);
-      loadFoto(t.foto).then(function(src){if(src)img.src=src;});
-    }
+    var ora=new Date(t.timestamp).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+    var card=document.createElement('div');
+    card.className='test-card';
+    var isMia=t.deviceId&&t.deviceId===mioId;
+    var editBtn=isMia?'<div style="margin-top:10px;"><button class="btn-gold btn-outline" style="font-size:.55rem;padding:5px 12px;margin-top:0;" onclick="modificaT('+JSON.stringify(t.id||String(t.timestamp))+')">&#9998; Modifica</button></div>':'';
+    card.innerHTML='<div class="test-nome">'+esc(t.nome)+' '+esc(t.cogn)+'</div>'+'<div class="test-ora">&#128205; '+ora+' &middot; 22 marzo 2026</div>'+'<div class="test-testo">'+esc(t.testo).replace(/\n/g,'<br>')+'</div>'+editBtn;
+    if(t.foto){var img=document.createElement('img');img.className='test-foto';img.alt='Foto';img.loading='lazy';card.appendChild(img);loadFoto(t.foto).then(function(src){if(src)img.src=src;});}
     grid.appendChild(card);
   });
 }
 
 async function modificaT(id) {
-  var nuovoTesto = prompt('Modifica il tuo testo:');
-  if(!nuovoTesto||!nuovoTesto.trim()) return;
-  var arr = await leggiTutte();
-  var idx = -1;
-  for(var i=0;i<arr.length;i++){if(arr[i].id===id){idx=i;break;}}
-  if(idx===-1) return;
-  arr[idx].testo = nuovoTesto.trim();
+  var testo=prompt('Modifica il tuo testo:');
+  if(!testo||!testo.trim())return;
+  var arr=await leggiTutte();
+  for(var i=0;i<arr.length;i++){if(arr[i].id===id){arr[i].testo=testo.trim();break;}}
   await salvaTutte(arr);
   aggiornaTestimonianze();
 }
@@ -832,7 +806,7 @@ function esc(s) {
 
 // ─── ESPORTA JSON ───
 async function esportaJSON() {
-  var data = JSON.stringify(await leggiTutte());
+  var data=JSON.stringify(await leggiTutte());
   const blob = new Blob([data], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -843,21 +817,21 @@ async function esportaJSON() {
 }
 
 // ─── IMPORTA JSON ───
-function importaJSON(event) {
+async function importaJSON(event) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async e => {
     try {
       const importate = JSON.parse(e.target.result);
       if (!Array.isArray(importate)) throw new Error('Formato non valido');
-      const esistenti = leggiTutte();
+      var esistenti=await leggiTutte();
       const existing_ts = new Set(esistenti.map(x => x.timestamp));
       let nuove = 0;
       importate.forEach(t => {
         if (!existing_ts.has(t.timestamp)) { esistenti.push(t); nuove++; }
       });
-      salvaTutte(esistenti);
+      await salvaTutte(esistenti);
       aggiornaTestimonianze();
       alert('✓ Importate ' + nuove + ' nuove testimonianze!');
     } catch(err) {
@@ -1099,7 +1073,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   aggiornaTestimonianze();
   setInterval(aggiornaTestimonianze, 30000);
-  if(isOrg()) showAdminBar();
 });
 </script>
 </body>
