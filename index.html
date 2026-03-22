@@ -684,15 +684,10 @@ async function salvaTutte(arr) {
 }
 
 async function uploadFoto(base64) {
-  const fd = new FormData();
-  fd.append('image', base64.split(',')[1]);
-  const res = await fetch('https://api.imgbb.com/1/upload?key='+IMGBB_KEY, {method:'POST',body:fd});
-  const d = await res.json();
-  if (d.success) return d.data.url;
-  throw new Error('Upload foto fallito');
+  return base64;
 }
 
-const MAX_PX=900, JPEG_Q=0.72;
+const MAX_PX=480, JPEG_Q=0.45;
 let fotoBase64=null;
 function comprimiFoto(file) {
   return new Promise(resolve=>{
