@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pellegrinaggio – Comunità di San Michele · Agliana</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+:root {
+  --p:#f5efe2; --c:#ede5d0; --o:#c8882a; --os:#e8c882;
+  --t:#a0522d; --b:#3e2a14; --dk:#1e1208; --s:#7a6040;
+  --ok:#2a7a40; --err:#c0392b;
+}
+html { scroll-behavior:smooth; }
+body { background:var(--p); color:var(--b); font-family:'EB Garamond',serif; overflow-x:hidden; }
+
+/* ── HERO ── */
+.hero { position:relative; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; background:radial-gradient(ellipse at 50% 0%,#c8dff0 0%,#8fb8d8 35%,#5a7da0 60%,#3a5468 100%); }
+.sun { position:absolute; top:8%; left:50%; transform:translateX(-50%); width:110px; height:110px; border-radius:50%; background:radial-gradient(circle,#fff9d0 0%,#ffd560 40%,#e8a020 70%,transparent 100%); box-shadow:0 0 80px 40px rgba(255,220,80,.35),0 0 160px 80px rgba(255,180,40,.15); animation:sunrise 3s ease-out forwards; opacity:0; }
+@keyframes sunrise { from{opacity:0;transform:translateX(-50%) translateY(40px)}to{opacity:1;transform:translateX(-50%) translateY(0)} }
+.hills { position:absolute; bottom:0; left:0; right:0; height:55%; pointer-events:none; }
+.hero-content { position:relative; z-index:10; text-align:center; padding:40px 24px 220px; opacity:0; animation:fadeInHero 2s ease-out .6s forwards; }
+@keyframes fadeInHero { from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)} }
+.hero-eyebrow { font-family:'Cinzel',serif; font-size:.68rem; letter-spacing:6px; text-transform:uppercase; color:rgba(255,255,255,.85); margin-bottom:14px; }
+.hero-title { font-family:'Cinzel',serif; font-size:clamp(2.2rem,6vw,4rem); font-weight:700; color:#fff; line-height:1.15; text-shadow:0 2px 20px rgba(60,40,10,.4); }
+.hero-title span { color:var(--os); display:block; font-weight:400; font-size:.68em; letter-spacing:3px; margin-top:6px; }
+.hero-sub { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-style:italic; color:rgba(255,255,255,.9); margin-top:12px; }
+.hero-date { margin-top:18px; display:inline-block; padding:6px 22px; border:1px solid rgba(255,255,255,.4); border-radius:40px; font-family:'Cinzel',serif; font-size:.68rem; letter-spacing:4px; text-transform:uppercase; color:rgba(255,255,255,.85); background:rgba(255,255,255,.1); }
+.scroll-hint { position:absolute; bottom:28px; left:50%; transform:translateX(-50%); z-index:20; color:rgba(255,255,255,.6); font-size:1.6rem; animation:bounce 2s infinite; }
+@keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(10px)} }
+
+/* ── BANNER ── */
+.special-banner { background:linear-gradient(135deg,#7a4010,#c8882a); color:#fff; text-align:center; padding:14px 24px; }
+.special-banner p { font-family:'Cinzel',serif; font-size:.7rem; letter-spacing:3px; text-transform:uppercase; }
+.special-banner span { color:var(--os); }
+
+/* ── LAYOUT ── */
+.container { max-width:820px; margin:0 auto; padding:0 24px; }
+.eyebrow { font-family:'Cinzel',serif; font-size:.65rem; letter-spacing:5px; text-transform:uppercase; color:var(--o); margin-bottom:14px; display:block; }
+.ornament-div { display:flex; align-items:center; justify-content:center; gap:16px; margin:44px 0; }
+.ornament-div .line { height:1px; flex:1; max-width:120px; background:linear-gradient(to right,transparent,var(--os)); }
+.ornament-div .line.r { background:linear-gradient(to left,transparent,var(--os)); }
+.ornament-div .symbol { color:var(--o); font-size:1rem; letter-spacing:6px; }
+
+/* ── GREETING ── */
+.greeting-section { padding:60px 0 20px; text-align:center; }
+.greeting-section h2 { font-family:'Cormorant Garamond',serif; font-size:clamp(1.9rem,4.5vw,3rem); font-weight:300; color:var(--b); line-height:1.25; margin-bottom:18px; }
+.greeting-section h2 em { font-style:italic; color:var(--o); }
+.greeting-text { font-size:1.1rem; line-height:1.9; color:var(--s); max-width:600px; margin:0 auto; }
+
+/* ── SAINTS ── */
+.saints-grid { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin:40px 0; }
+@media(max-width:580px){ .saints-grid{grid-template-columns:1fr;} }
+.saint-card { background:var(--c); border:1px solid var(--os); overflow:hidden; transition:transform .3s,box-shadow .3s; }
+.saint-card:hover { transform:translateY(-4px); box-shadow:0 16px 40px rgba(60,30,10,.12); }
+.saint-card .card-img { width:100%; height:220px; object-fit:cover; object-position:top center; display:block; filter:sepia(12%) contrast(1.05); }
+.card-fallback { width:100%; height:220px; display:flex; align-items:center; justify-content:center; font-size:5rem; background:linear-gradient(145deg,#d4c4a0,#b8a070); color:rgba(255,255,255,.6); }
+.card-body { padding:20px 22px 22px; }
+.card-tag { font-family:'Cinzel',serif; font-size:.58rem; letter-spacing:3px; text-transform:uppercase; color:var(--o); margin-bottom:8px; display:block; }
+.saint-card h3 { font-family:'Cormorant Garamond',serif; font-size:1.65rem; font-weight:400; color:var(--b); margin-bottom:8px; }
+.saint-card p { font-size:.93rem; line-height:1.7; color:var(--s); }
+.location { margin-top:10px; font-size:.78rem; color:var(--t); display:block; }
+
+/* ── BUTTONS ── */
+.btn-gold { display:inline-flex; align-items:center; gap:8px; margin-top:14px; padding:9px 20px; background:var(--o); color:#fff; font-family:'Cinzel',serif; font-size:.6rem; letter-spacing:3px; text-transform:uppercase; transition:background .25s; cursor:pointer; border:none; outline:none; text-decoration:none; }
+.btn-gold:hover { background:var(--t); }
+.btn-gold:disabled { background:#aaa; cursor:not-allowed; }
+.btn-outline { background:transparent; border:1px solid var(--o); color:var(--o); }
+.btn-outline:hover { background:var(--o); color:#fff; }
+
+/* ── QUOTES ── */
+.quotes-section { padding:20px 0 50px; }
+.quote-block { position:relative; margin-bottom:28px; padding:26px 30px 26px 58px; border-left:3px solid var(--o); background:linear-gradient(to right,rgba(200,136,42,.06),transparent); }
+.quote-block::before { content:'❝'; position:absolute; left:14px; top:14px; font-size:2.4rem; color:var(--os); line-height:1; }
+.quote-block p { font-family:'Cormorant Garamond',serif; font-size:1.22rem; font-style:italic; line-height:1.65; color:var(--b); }
+.quote-block .author { margin-top:8px; font-family:'Cinzel',serif; font-size:.6rem; letter-spacing:3px; text-transform:uppercase; color:var(--s); font-style:normal; }
+
+/* ── ROUTE ── */
+.route-wrap { background:var(--c); padding:50px 24px; }
+.route-steps { max-width:480px; margin:0 auto; position:relative; display:flex; flex-direction:column; }
+.route-steps::before { content:''; position:absolute; left:17px; top:12px; bottom:12px; width:1px; background:linear-gradient(to bottom,var(--o),var(--os),var(--o)); }
+.route-step { display:flex; align-items:flex-start; gap:20px; padding:12px 0; }
+.route-dot { width:34px; height:34px; border-radius:50%; background:var(--o); color:#fff; font-size:.8rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; position:relative; z-index:1; box-shadow:0 2px 10px rgba(200,136,42,.3); }
+.route-step-text h4 { font-family:'Cormorant Garamond',serif; font-size:1.15rem; font-weight:600; color:var(--b); }
+.route-step-text p { font-size:.9rem; color:var(--s); margin-top:2px; }
+
+/* ── PRAYER ── */
+.prayer-wrap { background:var(--b); padding:70px 24px 80px; text-align:center; }
+.prayer-wrap .eyebrow { color:var(--os); }
+.prayer-wrap blockquote { font-family:'Cormorant Garamond',serif; font-size:clamp(1.25rem,3vw,1.75rem); font-style:italic; color:rgba(255,255,255,.92); line-height:1.7; max-width:560px; margin:0 auto 22px; }
+.prayer-wrap .attribution { font-family:'Cinzel',serif; font-size:.63rem; letter-spacing:4px; text-transform:uppercase; color:var(--os); }
+.community-tag { margin-top:36px; display:inline-block; padding:10px 28px; border:1px solid rgba(255,255,255,.2); font-family:'Cinzel',serif; font-size:.68rem; letter-spacing:4px; text-transform:uppercase; color:rgba(255,255,255,.7); }
+
+/* ═══════════════════════
+   IO C'ERO
+═══════════════════════ */
+.icero-section { background:var(--p); padding:70px 24px; }
+.icero-section h2 { font-family:'Cormorant Garamond',serif; font-size:clamp(2rem,5vw,3rem); font-weight:300; color:var(--b); text-align:center; line-height:1.2; margin-bottom:10px; }
+.icero-section h2 em { font-style:italic; color:var(--o); }
+.icero-sub { text-align:center; font-size:1.05rem; color:var(--s); margin-bottom:40px; max-width:500px; margin-left:auto; margin-right:auto; }
+.form-card { background:var(--c); border:1px solid var(--os); padding:32px; max-width:640px; margin:0 auto 30px; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+@media(max-width:480px){ .form-row{grid-template-columns:1fr;} }
+.form-group { display:flex; flex-direction:column; gap:6px; }
+.form-group label { font-family:'Cinzel',serif; font-size:.6rem; letter-spacing:3px; text-transform:uppercase; color:var(--o); }
+.form-group input, .form-group textarea { background:#faf8f4; border:1px solid var(--os); padding:10px 14px; font-family:'EB Garamond',serif; font-size:1rem; color:var(--b); outline:none; transition:border-color .2s; resize:vertical; }
+.form-group input:focus, .form-group textarea:focus { border-color:var(--o); }
+.form-group textarea { min-height:110px; }
+.foto-area { margin-top:16px; border:2px dashed var(--os); padding:20px; text-align:center; cursor:pointer; transition:border-color .2s; position:relative; }
+.foto-area:hover { border-color:var(--o); }
+.foto-area input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+.foto-area p { font-family:'Cinzel',serif; font-size:.6rem; letter-spacing:3px; text-transform:uppercase; color:var(--s); }
+.foto-area .icon { font-size:2rem; margin-bottom:8px; display:block; }
+.foto-preview-wrap { margin-top:12px; display:none; }
+.foto-preview-wrap img { max-width:100%; max-height:200px; object-fit:cover; border:1px solid var(--os); }
+.form-submit-row { display:flex; align-items:center; justify-content:space-between; margin-top:20px; flex-wrap:wrap; gap:12px; }
+.form-note { font-size:.85rem; color:var(--s); font-style:italic; }
+#submit-msg { font-family:'Cinzel',serif; font-size:.62rem; letter-spacing:2px; text-transform:uppercase; padding:6px 0; display:none; }
+#submit-msg.ok { color:var(--ok); }
+#submit-msg.err { color:var(--err); }
+
+/* ── ADMIN IMPORT ── */
+.admin-bar { max-width:640px; margin:0 auto; padding:16px; background:var(--c); border:1px dashed var(--os); display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.admin-bar p { font-family:'Cinzel',serif; font-size:.58rem; letter-spacing:2px; text-transform:uppercase; color:var(--s); flex:1; }
+
+/* ═══════════════════════
+   TESTIMONIANZE
+═══════════════════════ */
+.testimonianze-section { background:var(--c); padding:60px 24px; }
+.test-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:24px; max-width:860px; margin:28px auto 0; }
+.test-card { background:#faf8f4; border:1px solid var(--os); padding:22px; position:relative; }
+.test-card .test-nome { font-family:'Cormorant Garamond',serif; font-size:1.35rem; font-weight:600; color:var(--b); margin-bottom:4px; }
+.test-card .test-ora { font-family:'Cinzel',serif; font-size:.55rem; letter-spacing:2px; text-transform:uppercase; color:var(--s); margin-bottom:12px; }
+.test-card .test-testo { font-size:1rem; line-height:1.7; color:var(--b); font-style:italic; }
+.test-card .test-foto { width:100%; margin-top:12px; max-height:180px; object-fit:cover; border:1px solid var(--os); }
+.test-empty { text-align:center; color:var(--s); font-style:italic; font-size:1.05rem; padding:20px 0; }
+#test-count { font-family:'Cinzel',serif; font-size:.72rem; letter-spacing:4px; text-transform:uppercase; color:var(--o); text-align:center; margin-bottom:6px; }
+
+/* ═══════════════════════
+   PDF SECTION
+═══════════════════════ */
+.pdf-section { background:var(--b); padding:70px 24px; text-align:center; }
+.pdf-section .eyebrow { color:var(--os); }
+.pdf-section h2 { font-family:'Cormorant Garamond',serif; font-size:clamp(1.8rem,4vw,2.6rem); font-weight:300; color:#fff; line-height:1.2; margin-bottom:16px; }
+.pdf-section h2 em { color:var(--os); font-style:italic; }
+.pdf-section > div > p { font-size:1.05rem; color:rgba(255,255,255,.75); max-width:480px; margin:0 auto 30px; }
+.countdown-box { display:inline-flex; align-items:center; gap:20px; padding:20px 36px; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.05); margin-bottom:24px; }
+.count-unit { display:flex; flex-direction:column; align-items:center; }
+.count-num { font-family:'Cinzel',serif; font-size:2.4rem; font-weight:700; color:var(--os); line-height:1; }
+.count-label { font-family:'Cinzel',serif; font-size:.5rem; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,.5); margin-top:4px; }
+.count-sep { font-size:2rem; color:var(--os); margin-bottom:10px; }
+#pdf-btn-wrap { display:none; margin-top:20px; }
+.btn-pdf { display:inline-flex; align-items:center; gap:12px; padding:14px 36px; background:var(--o); color:#fff; font-family:'Cinzel',serif; font-size:.75rem; letter-spacing:4px; text-transform:uppercase; cursor:pointer; border:none; transition:background .25s; }
+.btn-pdf:hover { background:var(--t); }
+#pdf-status { margin-top:14px; font-family:'Cinzel',serif; font-size:.62rem; letter-spacing:3px; text-transform:uppercase; color:var(--os); min-height:20px; }
+.deadline-badge { display:inline-block; margin:0 auto 20px; padding:8px 22px; border:1px solid var(--os); font-family:'Cinzel',serif; font-size:.65rem; letter-spacing:3px; text-transform:uppercase; color:var(--os); }
+
+/* ═══════════════════════
+   CARLO ACUTIS
+═══════════════════════ */
+.white-bridge { height:60px; background:linear-gradient(to bottom,var(--dk),#faf8f4); }
+#sezione-carlo { background:#faf8f4; padding:80px 24px; }
+.ca-inner { max-width:680px; margin:0 auto; text-align:center; }
+.santo-badge { display:inline-block; margin-bottom:28px; padding:7px 22px; background:linear-gradient(135deg,#c9a84c,#e8d4a0,#c9a84c); font-family:'Cinzel',serif; font-size:.65rem; letter-spacing:5px; text-transform:uppercase; color:#3e2a14; }
+.ca-ornament { font-family:'Cinzel',serif; font-size:.65rem; letter-spacing:6px; text-transform:uppercase; color:#c9a84c; margin-bottom:24px; display:block; }
+.ca-photo-wrap { display:flex; justify-content:center; margin-bottom:36px; }
+.ca-photo-inner { position:relative; width:200px; height:260px; }
+.ca-photo-inner::before { content:''; position:absolute; inset:-8px; border:1px solid #e8d4a0; z-index:0; }
+.ca-photo-inner::after { content:''; position:absolute; inset:-16px; border:1px solid #f0ece2; z-index:0; }
+.ca-photo-inner img { width:100%; height:100%; object-fit:cover; object-position:top center; display:block; position:relative; z-index:1; filter:sepia(8%) contrast(1.05); }
+.ca-photo-fallback { width:100%; height:100%; background:linear-gradient(160deg,#d6cfc0,#b8ad9a); display:flex; align-items:center; justify-content:center; font-size:5rem; color:rgba(255,255,255,.7); position:relative; z-index:1; }
+.ca-name { font-family:'Cormorant Garamond',serif; font-size:clamp(2.4rem,5vw,3.2rem); font-weight:300; color:#3e2a14; letter-spacing:3px; line-height:1.1; }
+.ca-name em { font-style:italic; color:#c9a84c; }
+.ca-dates { font-family:'Cormorant Garamond',serif; font-size:.82rem; letter-spacing:4px; color:#7a6a5a; text-transform:uppercase; margin-top:10px; display:block; }
+.ca-div { display:flex; align-items:center; justify-content:center; gap:14px; margin:26px 0; }
+.ca-div .cl { height:1px; width:80px; background:linear-gradient(to right,transparent,#e8d4a0); }
+.ca-div .cr { background:linear-gradient(to left,transparent,#e8d4a0) !important; }
+.ca-location-note { margin:0 0 28px; padding:12px 18px; background:#f0ece2; border:1px solid #e8d4a0; font-family:'Cinzel',serif; font-size:.62rem; letter-spacing:3px; text-transform:uppercase; color:#7a6a5a; }
+.ca-location-note strong { color:#c8882a; }
+.ca-quotes { display:flex; flex-direction:column; gap:28px; margin:10px 0 36px; text-align:left; }
+.ca-q { position:relative; padding:22px 26px 22px 46px; background:#f0ece2; border-left:2px solid #c9a84c; }
+.ca-q::before { content:'\201C'; position:absolute; left:12px; top:8px; font-family:'Cormorant Garamond',serif; font-size:3.2rem; color:#e8d4a0; line-height:1; }
+.ca-q p { font-family:'Cormorant Garamond',serif; font-size:1.05rem; font-style:italic; line-height:1.75; color:#2c2218; }
+.ca-q .att { margin-top:8px; font-size:.72rem; letter-spacing:2px; text-transform:uppercase; color:#7a6a5a; }
+.ca-portrait { line-height:1.85; font-size:1.06rem; color:#2c2218; text-align:justify; hyphens:auto; }
+.ca-portrait p+p { margin-top:16px; }
+.ca-portrait strong { font-weight:600; color:#3e2a14; }
+.ca-stars { text-align:center; font-size:.6rem; letter-spacing:8px; color:#c9a84c; margin:28px 0 10px; }
+.ca-final { text-align:center; padding-top:24px; border-top:1px solid #e8d4a0; }
+.ca-final .prayer { font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-style:italic; color:#c9a84c; }
+.ca-final .year { font-family:'Cormorant Garamond',serif; font-size:.78rem; letter-spacing:4px; text-transform:uppercase; color:#7a6a5a; margin-top:8px; display:block; }
+footer { background:var(--dk); color:rgba(255,255,255,.4); text-align:center; padding:20px; font-family:'Cinzel',serif; font-size:.6rem; letter-spacing:3px; text-transform:uppercase; }
+
+/* ── MISC ── */
+#flash-overlay { display:none; position:fixed; inset:0; background:#fff; z-index:9999; pointer-events:none; opacity:0; }
+.spinner { display:inline-block; width:13px; height:13px; border:2px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; margin-right:6px; }
+.spinner.dark { border-color:rgba(200,136,42,.3); border-top-color:var(--o); }
+@keyframes spin { to{transform:rotate(360deg)} }
+</style>
+</head>
+<body>
+
+<div id="flash-overlay"></div>
+
+<!-- ══ SITO SCADUTO ══ -->
+<div id="expired-overlay" style="display:none;position:fixed;inset:0;z-index:9998;background:#1e1208;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:40px;">
+  <div style="max-width:400px;border:1px solid rgba(200,136,42,.4);padding:48px 36px;">
+    <div style="font-size:3rem;color:#c9a84c;margin-bottom:20px;">✝</div>
+    <p style="font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:5px;text-transform:uppercase;color:#c9a84c;margin-bottom:14px;">Comunità di San Michele · Agliana</p>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:#fff;line-height:1.3;margin-bottom:20px;">Il sito del pellegrinaggio<br><em style="color:#c9a84c;">è stato chiuso.</em></h2>
+    <p style="font-family:'EB Garamond',serif;font-size:1.05rem;line-height:1.8;color:rgba(255,255,255,.65);margin-bottom:28px;">
+      La raccolta delle testimonianze e la stampa del libro si sono concluse il <strong style="color:#e8c882;">31 marzo 2026</strong>.<br><br>
+      Grazie a tutti i pellegrini che hanno condiviso la loro esperienza. Il ricordo di questa giornata resterà per sempre nei nostri cuori.
+    </p>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-style:italic;color:#c9a84c;">
+      «Verso il Cielo a tutta velocità.»<br>
+      <span style="font-size:.8rem;letter-spacing:2px;font-family:'Cinzel',serif;font-style:normal;color:rgba(255,255,255,.4);">San Carlo Acutis</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCHERMATA PIN ══ -->
+<div id="pin-overlay">
+  <div id="pin-box">
+    <div id="pin-cross">✝</div>
+    <p id="pin-titolo">Comunità di San Michele<br><span>Agliana</span></p>
+    <p id="pin-sub">Inserisci il PIN per accedere</p>
+    <div id="pin-dots">
+      <span class="dot" id="d0"></span>
+      <span class="dot" id="d1"></span>
+      <span class="dot" id="d2"></span>
+      <span class="dot" id="d3"></span>
+      <span class="dot" id="d4"></span>
+      <span class="dot" id="d5"></span>
+      <span class="dot" id="d6"></span>
+      <span class="dot" id="d7"></span>
+    </div>
+    <p id="pin-err"></p>
+    <div id="pin-tastiera">
+      <button onclick="pinDigit('1')">1</button>
+      <button onclick="pinDigit('2')">2</button>
+      <button onclick="pinDigit('3')">3</button>
+      <button onclick="pinDigit('4')">4</button>
+      <button onclick="pinDigit('5')">5</button>
+      <button onclick="pinDigit('6')">6</button>
+      <button onclick="pinDigit('7')">7</button>
+      <button onclick="pinDigit('8')">8</button>
+      <button onclick="pinDigit('9')">9</button>
+      <button onclick="pinDigit('0')" style="grid-column:2;">0</button>
+      <button onclick="pinCancella()" class="pin-del">⌫</button>
+    </div>
+  </div>
+</div>
+
+<style>
+#pin-overlay {
+  position:fixed; inset:0; z-index:10000;
+  background: radial-gradient(ellipse at 50% 30%, #4a6e3a 0%, #2e4e24 50%, #1a3014 100%);
+  display:flex; align-items:center; justify-content:center;
+  transition: opacity .6s ease;
+}
+#pin-overlay.hide { opacity:0; pointer-events:none; }
+#pin-box {
+  text-align:center; padding:40px 32px 36px;
+  background:rgba(0,0,0,.25);
+  border:1px solid rgba(200,136,42,.4);
+  max-width:320px; width:90%;
+  backdrop-filter:blur(8px);
+}
+#pin-cross {
+  font-size:2.8rem; color:var(--os);
+  margin-bottom:12px;
+  text-shadow: 0 0 20px rgba(200,136,42,.5);
+}
+#pin-titolo {
+  font-family:'Cinzel',serif; font-size:.9rem; letter-spacing:3px;
+  text-transform:uppercase; color:#fff; line-height:1.6; margin-bottom:4px;
+}
+#pin-titolo span { color:var(--os); }
+#pin-sub {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:1rem; color:rgba(255,255,255,.6); margin-bottom:24px;
+}
+#pin-dots {
+  display:flex; justify-content:center; gap:12px; margin-bottom:10px;
+}
+.dot {
+  width:14px; height:14px; border-radius:50%;
+  border:2px solid rgba(200,136,42,.6);
+  background:transparent;
+  transition:background .2s, transform .15s;
+}
+.dot.filled {
+  background:var(--os);
+  border-color:var(--os);
+  transform:scale(1.15);
+}
+#pin-err {
+  font-family:'Cinzel',serif; font-size:.58rem; letter-spacing:3px;
+  text-transform:uppercase; color:#e05050;
+  min-height:18px; margin-bottom:16px;
+  animation: nope .35s ease;
+}
+@keyframes nope {
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-8px)}
+  60%{transform:translateX(8px)}
+}
+#pin-tastiera {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+}
+#pin-tastiera button {
+  padding:14px 0; font-family:'Cinzel',serif; font-size:1.1rem;
+  font-weight:600; color:#fff;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.15);
+  cursor:pointer; border-radius:4px;
+  transition:background .15s, transform .1s;
+}
+#pin-tastiera button:hover { background:rgba(200,136,42,.35); }
+#pin-tastiera button:active { transform:scale(.93); }
+.pin-del { color:var(--os) !important; font-size:1.2rem !important; }
+</style>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="sun"></div>
+  <svg class="hills" viewBox="0 0 1440 400" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="h1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7a9e6e"/><stop offset="100%" stop-color="#4a6e3a"/></linearGradient>
+      <linearGradient id="h2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5e8a50"/><stop offset="100%" stop-color="#3a5e2a"/></linearGradient>
+      <linearGradient id="h3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4a7840"/><stop offset="100%" stop-color="#2e4e24"/></linearGradient>
+    </defs>
+    <path d="M0,300 Q200,180 400,220 Q600,260 800,200 Q1000,140 1200,180 Q1300,200 1440,160 L1440,400 L0,400 Z" fill="url(#h1)" opacity=".6"/>
+    <path d="M0,340 Q180,260 360,290 Q540,320 720,260 Q900,200 1080,240 Q1260,280 1440,220 L1440,400 L0,400 Z" fill="url(#h2)" opacity=".8"/>
+    <path d="M0,380 Q240,320 480,350 Q720,380 960,340 Q1200,300 1440,320 L1440,400 L0,400 Z" fill="url(#h3)"/>
+    <g transform="translate(580,140)" opacity=".85">
+      <rect x="40" y="60" width="160" height="80" fill="#c8a060"/>
+      <rect x="70" y="30" width="100" height="90" fill="#d4aa70"/>
+      <polygon points="70,30 120,5 170,30" fill="#b89050"/>
+      <rect x="0" y="20" width="35" height="120" fill="#c09848"/>
+      <rect x="5" y="10" width="25" height="15" fill="#b08840"/>
+      <polygon points="0,10 17,-5 35,10" fill="#a07830"/>
+      <circle cx="120" cy="48" r="10" fill="none" stroke="#a07028" stroke-width="2"/>
+      <circle cx="120" cy="48" r="5" fill="#d4b878"/>
+    </g>
+    <ellipse cx="540" cy="270" rx="10" ry="40" fill="#2e5020" opacity=".7"/>
+    <ellipse cx="880" cy="265" rx="10" ry="42" fill="#2e5020" opacity=".7"/>
+  </svg>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Comunità Parrocchiale · San Michele · Agliana</p>
+    <h1 class="hero-title">Pellegrinaggio<span>ad Assisi</span></h1>
+    <p class="hero-sub">Sulle orme di Francesco e Carlo</p>
+    <span class="hero-date">22 Marzo 2026</span>
+  </div>
+  <div class="scroll-hint">↓</div>
+</section>
+
+<div class="special-banner">
+  <p>⭐ Oggi è l'<span>ultimo giorno</span> dell'ostensione straordinaria delle spoglie di San Francesco · 800 anni dalla sua morte ⭐</p>
+</div>
+<svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" style="display:block;background:#7a4010;"><path d="M0,60 Q360,0 720,40 Q1080,80 1440,20 L1440,60 Z" fill="#f5efe2"/></svg>
+
+<!-- ══ CORPO ══ -->
+<div class="container">
+  <section class="greeting-section">
+    <span class="eyebrow">✦ Buon Pellegrinaggio ✦</span>
+    <h2>Camminate nella luce,<br><em>pellegrini di speranza.</em></h2>
+    <p class="greeting-text">
+      Oggi la nostra comunità di <strong>San Michele di Agliana</strong> si mette in cammino verso la terra di Umbria. Portiamo nel cuore le nostre intenzioni, le gioie e i dolori, la certezza che ogni passo è custodito da Dio.<br><br>
+      Andiamo a incontrare due grandi Santi: il <em>Poverello d'Assisi</em>, le cui spoglie vengono oggi esposte nell'ostensione straordinaria degli 800 anni, e il giovane <em>San Carlo Acutis</em>, canonizzato il 7 settembre 2025, le cui spoglie riposano nel Santuario della Spogliazione ad Assisi.
+    </p>
+  </section>
+
+  <div class="ornament-div"><span class="line"></span><span class="symbol">✦ ✝ ✦</span><span class="line r"></span></div>
+
+  <div class="saints-grid">
+    <div class="saint-card">
+      <img class="card-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Giovanni_Bellini_-_Saint_Francis_in_the_Desert.jpg/500px-Giovanni_Bellini_-_Saint_Francis_in_the_Desert.jpg" alt="San Francesco d'Assisi" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+      <div class="card-fallback" style="display:none;">☩</div>
+      <div class="card-body">
+        <span class="card-tag">⭐ Oggi · Ostensione Straordinaria 800 anni</span>
+        <h3>San Francesco<br>d'Assisi</h3>
+        <p>Il Santo del Cantico delle Creature. Oggi — ultimo giorno — le sue spoglie sono esposte straordinariamente per gli 800 anni dalla morte.</p>
+        <span class="location">📍 Basilica di San Francesco, Assisi</span>
+      </div>
+    </div>
+    <div class="saint-card">
+      <img class="card-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Carlo_Acutis_2006.jpg/400px-Carlo_Acutis_2006.jpg" alt="San Carlo Acutis" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+      <div class="card-fallback" style="display:none;">✝</div>
+      <div class="card-body">
+        <span class="card-tag">Santo dal 7 settembre 2025</span>
+        <h3>San Carlo<br>Acutis</h3>
+        <p>Il «santo del web», canonizzato da Papa Leone XIV. Le sue spoglie riposano nel Santuario della Spogliazione ad Assisi.</p>
+        <span class="location">📍 Santuario della Spogliazione, Assisi</span>
+        <button class="btn-gold" onclick="scorriACarlo()">✦ &nbsp; Scopri il ritratto di Carlo</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="quotes-section">
+    <span class="eyebrow" style="text-align:center;">✦ &nbsp; Parole per il cammino &nbsp; ✦</span>
+    <div class="quote-block"><p>Cominciate col fare ciò che è necessario, poi ciò che è possibile, e all'improvviso vi sorprenderete a fare l'impossibile.</p><p class="author">San Francesco d'Assisi</p></div>
+    <div class="quote-block"><p>Il pellegrinaggio non è tanto andare in un luogo santo, quanto lasciarsi trasformare da quel luogo nel profondo del cuore.</p><p class="author">Riflessione del cammino</p></div>
+    <div class="quote-block"><p>Tutti nascono originali, ma molti muoiono come fotocopie. Siate sempre voi stessi, non copie degli altri.</p><p class="author">San Carlo Acutis</p></div>
+    <div class="quote-block"><p>Signore, fa' di me uno strumento della tua pace. Dov'è odio, ch'io porti l'amore; dov'è offesa, ch'io porti il perdono.</p><p class="author">Preghiera di San Francesco</p></div>
+    <div class="quote-block"><p>Camminare insieme è già una preghiera. Ogni passo condiviso è un atto di fede che Dio vede e custodisce.</p><p class="author">Comunità di San Michele · Agliana</p></div>
+  </section>
+</div>
+
+<div class="route-wrap">
+  <div style="max-width:820px;margin:0 auto;">
+    <span class="eyebrow" style="text-align:center;">Il nostro cammino di oggi</span>
+    <div class="route-steps">
+      <div class="route-step"><div class="route-dot">⛪</div><div class="route-step-text"><h4>Agliana · San Michele</h4><p>Partenza dalla parrocchia, benedizione del cammino</p></div></div>
+      <div class="route-step"><div class="route-dot">✦</div><div class="route-step-text"><h4>Basilica di San Francesco</h4><p>Venerazione nell'ostensione straordinaria degli 800 anni (ultimo giorno)</p></div></div>
+      <div class="route-step"><div class="route-dot">✦</div><div class="route-step-text"><h4>Santuario della Spogliazione</h4><p>Preghiera davanti alle spoglie di San Carlo Acutis</p></div></div>
+      <div class="route-step"><div class="route-dot">🏠</div><div class="route-step-text"><h4>Ritorno ad Agliana</h4><p>Con il cuore pieno di grazia e gratitudine</p></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="prayer-wrap">
+  <div style="max-width:620px;margin:0 auto;">
+    <span class="eyebrow">✦ &nbsp; Preghiera del pellegrino &nbsp; ✦</span>
+    <blockquote>«Signore, fa' che questo cammino ci cambi.<br>Che le strade di Assisi diventino le strade del nostro cuore.<br>Che incontrare Francesco e Carlo ci insegni a vivere ogni giorno come dono, ogni momento come grazia, ogni persona come presenza del tuo volto.»</blockquote>
+    <p class="attribution">Preghiera per il pellegrinaggio · 22 marzo 2026</p>
+    <div class="community-tag">Parrocchia San Michele · Agliana (PT)</div>
+  </div>
+</div>
+
+<!-- ══ IO C'ERO ══ -->
+<section class="icero-section">
+  <div class="container">
+    <span class="eyebrow" style="text-align:center;">✦ &nbsp; La tua voce &nbsp; ✦</span>
+    <h2 style="text-align:center;"><em>Io c'ero.</em><br>Racconta la tua giornata.</h2>
+    <p class="icero-sub">Lascia la tua testimonianza: sarà raccolta nel libro digitale del pellegrinaggio.</p>
+
+    <div class="form-card">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="inp-nome">Nome *</label>
+          <input type="text" id="inp-nome" placeholder="Il tuo nome" maxlength="50" />
+        </div>
+        <div class="form-group">
+          <label for="inp-cogn">Cognome *</label>
+          <input type="text" id="inp-cogn" placeholder="Il tuo cognome" maxlength="50" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="inp-testo">La tua esperienza *</label>
+        <textarea id="inp-testo" placeholder="Racconta cosa hai vissuto oggi, cosa ti ha toccato il cuore, un pensiero, una preghiera…" maxlength="1200"></textarea>
+      </div>
+      <div class="foto-area" id="foto-area">
+        <input type="file" id="inp-foto" accept="image/*" onchange="anteprima(event)" />
+        <span class="icon">📷</span>
+        <p>Tocca o clicca per allegare una foto</p>
+        <p style="font-size:.55rem;margin-top:4px;color:var(--s);">La foto verrà compressa automaticamente</p>
+        <div class="foto-preview-wrap" id="preview-wrap">
+          <img id="preview-img" src="" alt="Anteprima" />
+          <p style="font-size:.7rem;color:var(--s);margin-top:6px;" id="preview-info"></p>
+        </div>
+      </div>
+      <div class="form-submit-row">
+        <span class="form-note">* campi obbligatori</span>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+          <span id="submit-msg"></span>
+          <button class="btn-gold" id="btn-submit" onclick="inviaTestimonianza()">✝ &nbsp; Invia la mia testimonianza</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra organizzatore: importa JSON da altri dispositivi -->
+    <div class="admin-bar">
+      <p>🔧 Organizzatore — importa testimonianze da altri dispositivi:</p>
+      <label style="cursor:pointer;">
+        <input type="file" id="inp-import" accept=".json" onchange="importaJSON(event)" style="display:none;" />
+        <span class="btn-gold btn-outline" style="margin-top:0;font-size:.58rem;padding:7px 14px;">📂 Importa JSON</span>
+      </label>
+      <button class="btn-gold btn-outline" style="margin-top:0;font-size:.58rem;padding:7px 14px;" onclick="esportaJSON()">💾 Esporta JSON</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIANZE ══ -->
+<section class="testimonianze-section">
+  <div class="container">
+    <span class="eyebrow" style="text-align:center;">✦ &nbsp; I pellegrini di oggi &nbsp; ✦</span>
+    <p id="test-count">Caricamento…</p>
+    <div id="test-grid" class="test-grid"><p class="test-empty">Le testimonianze appariranno qui.</p></div>
+    <div style="text-align:center;margin-top:24px;">
+      <button class="btn-gold" onclick="aggiornaTestimonianze()">↻ &nbsp; Aggiorna</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PDF ══ -->
+<section class="pdf-section">
+  <div style="max-width:620px;margin:0 auto;">
+    <span class="eyebrow">✦ &nbsp; Il libro del pellegrinaggio &nbsp; ✦</span>
+    <h2>Il nostro <em>libro dei ricordi</em></h2>
+
+    <!-- FASE 1: countdown a mezzanotte del 22 marzo -->
+    <div id="countdown-wrap">
+      <p style="font-size:1.05rem;color:rgba(255,255,255,.75);margin-bottom:20px;">
+        A mezzanotte del 22 marzo il PDF con tutte le testimonianze sarà disponibile per tutti.
+      </p>
+      <div class="countdown-box">
+        <div class="count-unit"><span class="count-num" id="cd-h">00</span><span class="count-label">ore</span></div>
+        <span class="count-sep">:</span>
+        <div class="count-unit"><span class="count-num" id="cd-m">00</span><span class="count-label">min</span></div>
+        <span class="count-sep">:</span>
+        <div class="count-unit"><span class="count-num" id="cd-s">00</span><span class="count-label">sec</span></div>
+      </div>
+      <p style="font-size:.8rem;opacity:.6;margin-top:10px;">Il PDF si sblocca a mezzanotte del 22 marzo 2026</p>
+    </div>
+
+    <!-- FASE 2: PDF disponibile (23 mar – 31 mar) -->
+    <div id="pdf-btn-wrap" style="display:none;">
+      <p style="color:var(--os);font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-style:italic;margin-bottom:14px;">
+        «Il pellegrinaggio è finito. Il ricordo è eterno.»
+      </p>
+      <div class="deadline-badge" id="deadline-badge">
+        📅 &nbsp; Disponibile fino al <strong>31 marzo 2026</strong>
+      </div>
+      <button class="btn-pdf" id="btn-pdf" onclick="generaPDF()">
+        <span style="font-size:1.4rem;">📖</span> Scarica il libro del pellegrinaggio
+      </button>
+      <p id="pdf-status"></p>
+      <p style="font-size:.75rem;color:rgba(255,255,255,.45);margin-top:14px;">
+        Puoi scaricare il PDF dal tuo dispositivo e stamparlo.<br>
+        Il sito e la funzione di stampa si chiuderanno il <strong style="color:var(--os);">31 marzo 2026</strong>.
+      </p>
+    </div>
+
+    <!-- FASE 3: sito scaduto (visibile solo qui nella sezione) -->
+    <div id="pdf-expired-wrap" style="display:none;">
+      <p style="color:rgba(255,255,255,.5);font-size:1.05rem;font-style:italic;">
+        Il periodo di raccolta e stampa è terminato il 31 marzo 2026.<br>
+        Speriamo che il ricordo di questo pellegrinaggio resti nel cuore.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CARLO ACUTIS ══ -->
+<div class="white-bridge"></div>
+<section id="sezione-carlo">
+  <div class="ca-inner">
+    <div class="santo-badge">✦ &nbsp; Santo &nbsp; ✦</div>
+    <span class="ca-ornament">Canonizzato il 7 settembre 2025</span>
+    <div class="ca-photo-wrap">
+      <div class="ca-photo-inner">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Carlo_Acutis_2006.jpg/400px-Carlo_Acutis_2006.jpg" alt="San Carlo Acutis" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+        <div class="ca-photo-fallback" style="display:none;">✝</div>
+      </div>
+    </div>
+    <h2 class="ca-name">Carlo <em>Acutis</em></h2>
+    <span class="ca-dates">3 maggio 1991 &ensp;†&ensp; 12 ottobre 2006</span>
+    <div class="ca-div"><span class="cl"></span><span style="color:#c9a84c;">✦</span><span class="cl cr"></span></div>
+    <div class="ca-location-note">📍 Le sue spoglie riposano al &nbsp;<strong>Santuario della Spogliazione</strong>&nbsp; (Chiesa di Santa Maria Maggiore) · Assisi</div>
+    <div class="ca-quotes">
+      <div class="ca-q"><p>Tutti nascono originali, ma molti muoiono come fotocopie.</p><p class="att">San Carlo Acutis</p></div>
+      <div class="ca-q"><p>L'Eucarestia è la mia autostrada per il Cielo.</p><p class="att">San Carlo Acutis</p></div>
+      <div class="ca-q"><p>Stare sempre uniti a Gesù, questo è il mio programma di vita.</p><p class="att">San Carlo Acutis</p></div>
+      <div class="ca-q"><p>Posso perdere tutto, ma non la fede.</p><p class="att">San Carlo Acutis</p></div>
+    </div>
+    <div class="ca-portrait" style="text-align:left;">
+      <p>Carlo Acutis nacque a Londra il 3 maggio 1991 e crebbe a Milano. Fin da bambino mostrò un'attrazione straordinaria per l'Eucarestia: a sette anni chiese ai genitori di poter ricevere la Comunione ogni giorno.</p>
+      <p>Appassionato di informatica, creò un sito web che catalogava oltre <strong>150 miracoli eucaristici</strong> in tutto il mondo — oggi mostra itinerante visitata da milioni di persone.</p>
+      <p>Amava i videogiochi, il calcio e la musica, eppure non perdeva mai la sua intimità con Dio. Aveva espresso il desiderio di essere sepolto ad Assisi, città che amava profondamente.</p>
+      <p>Nell'ottobre del 2006, a soli <strong>15 anni</strong>, morì di leucemia fulminante offrendo la sua sofferenza per il Papa e per la Chiesa.</p>
+      <p>Il <strong>7 settembre 2025</strong>, Papa Leone XIV lo ha proclamato <strong>Santo</strong>. Le sue spoglie riposano nel <strong>Santuario della Spogliazione</strong> ad Assisi, dove ogni giorno giungono pellegrini da tutto il mondo.</p>
+    </div>
+    <div class="ca-stars">✦ &nbsp; ✦ &nbsp; ✦</div>
+    <div class="ca-final">
+      <p class="prayer">«Verso il Cielo a tutta velocità.»</p>
+      <span class="year">San Carlo Acutis &nbsp;·&nbsp; Patrono di Internet</span>
+    </div>
+    <div style="margin-top:40px;text-align:center;">
+      <button class="btn-gold" onclick="scorriInAlto()">↑ &nbsp; Torna al pellegrinaggio</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Comunità di San Michele · Agliana (PT) &nbsp;·&nbsp; Pellegrinaggio ad Assisi &nbsp;·&nbsp; 22 marzo 2026
+</footer>
+
+<!-- ══════════════════════════════════════
+     SCRIPT — 100% localStorage, nessun server
+══════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ─── PIN ───
+const PIN_CORRETTO = '22032026';
+const PIN_LS_KEY   = 'sm_pin_ok_22mar2026';
+let pinCorrente    = '';
+
+function pinDigit(d) {
+  if (pinCorrente.length >= 8) return;
+  pinCorrente += d;
+  aggiornaDots();
+  if (pinCorrente.length === 8) setTimeout(verificaPin, 150);
+}
+
+function pinCancella() {
+  pinCorrente = pinCorrente.slice(0, -1);
+  aggiornaDots();
+  document.getElementById('pin-err').textContent = '';
+}
+
+function aggiornaDots() {
+  for (var i = 0; i < 8; i++) {
+    document.getElementById('d' + i).classList.toggle('filled', i < pinCorrente.length);
+  }
+}
+
+function verificaPin() {
+  if (pinCorrente === PIN_CORRETTO) {
+    sessionStorage.setItem(PIN_LS_KEY, '1');
+    var ov = document.getElementById('pin-overlay');
+    ov.classList.add('hide');
+    setTimeout(function() { ov.style.display = 'none'; }, 700);
+  } else {
+    var err = document.getElementById('pin-err');
+    err.textContent = '\u2717 PIN errato — riprova';
+    err.style.animation = 'none';
+    void err.offsetWidth;
+    err.style.animation = 'nope .35s ease';
+    pinCorrente = '';
+    aggiornaDots();
+  }
+}
+
+// ─── CHIAVE localStorage ───
+const LS_KEY = 'pellegrinaggio_sm_22mar2026';
+
+// ─── LEGGI tutte le testimonianze ───
+function leggiTutte() {
+  try {
+    return JSON.parse(localStorage.getItem(LS_KEY) || '[]');
+  } catch(e) { return []; }
+}
+
+// ─── SALVA tutte le testimonianze ───
+function salvaTutte(arr) {
+  localStorage.setItem(LS_KEY, JSON.stringify(arr));
+}
+
+// ─── AGGIUNGI una testimonianza ───
+function aggiungiTestimonianza(obj) {
+  const arr = leggiTutte();
+  arr.push(obj);
+  salvaTutte(arr);
+}
+
+// ─── COMPRESSIONE FOTO ───
+const MAX_PX = 900, JPEG_Q = 0.72;
+let fotoBase64 = null;
+
+function comprimiFoto(file) {
+  return new Promise(resolve => {
+    const r = new FileReader();
+    r.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > MAX_PX || h > MAX_PX) {
+          if (w > h) { h = Math.round(h * MAX_PX / w); w = MAX_PX; }
+          else       { w = Math.round(w * MAX_PX / h); h = MAX_PX; }
+        }
+        const cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        cv.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve({ dataUrl: cv.toDataURL('image/jpeg', JPEG_Q), w, h });
+      };
+      img.src = e.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+async function anteprima(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const info = document.getElementById('preview-info');
+  info.textContent = 'Compressione in corso…';
+  const { dataUrl, w, h } = await comprimiFoto(file);
+  fotoBase64 = dataUrl;
+  const kb = Math.round(dataUrl.length * 0.75 / 1024);
+  info.textContent = w + '×' + h + 'px · ' + kb + ' KB (compressa)';
+  document.getElementById('preview-img').src = dataUrl;
+  document.getElementById('preview-wrap').style.display = 'block';
+}
+
+// ─── INVIA TESTIMONIANZA ───
+async function inviaTestimonianza() {
+  if (statoSito() === 2) {
+    alert('Il periodo di raccolta testimonianze è terminato il 31 marzo 2026.');
+    return;
+  }
+  const nome  = document.getElementById('inp-nome').value.trim();
+  const cogn  = document.getElementById('inp-cogn').value.trim();
+  const testo = document.getElementById('inp-testo').value.trim();
+  const msg   = document.getElementById('submit-msg');
+  const btn   = document.getElementById('btn-submit');
+
+  if (!nome || !cogn || !testo) {
+    mostraMsg(msg, 'err', '✗ Compila tutti i campi obbligatori');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Salvataggio…';
+
+  try {
+    aggiungiTestimonianza({
+      nome, cogn, testo,
+      foto: fotoBase64 || null,
+      timestamp: Date.now()
+    });
+    mostraMsg(msg, 'ok', '✓ Testimonianza salvata — grazie!');
+    document.getElementById('inp-nome').value = '';
+    document.getElementById('inp-cogn').value = '';
+    document.getElementById('inp-testo').value = '';
+    document.getElementById('inp-foto').value = '';
+    document.getElementById('preview-wrap').style.display = 'none';
+    fotoBase64 = null;
+    aggiornaTestimonianze();
+  } catch(e) {
+    mostraMsg(msg, 'err', '✗ Errore. Spazio disco pieno?');
+    console.error(e);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '✝ &nbsp; Invia la mia testimonianza';
+}
+
+function mostraMsg(el, tipo, testo) {
+  el.textContent = testo;
+  el.className = tipo;
+  el.style.display = 'inline';
+  setTimeout(() => { el.style.display = 'none'; }, 5000);
+}
+
+// ─── MOSTRA TESTIMONIANZE ───
+function aggiornaTestimonianze() {
+  const grid    = document.getElementById('test-grid');
+  const countEl = document.getElementById('test-count');
+  const list    = leggiTutte().sort((a, b) => a.timestamp - b.timestamp);
+
+  if (!list.length) {
+    countEl.textContent = '0 pellegrini — sii il primo!';
+    grid.innerHTML = '<p class="test-empty">Nessuna testimonianza ancora. Lascia la tua qui sopra!</p>';
+    return;
+  }
+
+  countEl.textContent = list.length + (list.length === 1 ? ' pellegrino ha' : ' pellegrini hanno') + ' condiviso la propria esperienza';
+  grid.innerHTML = '';
+  list.forEach(t => {
+    const ora = new Date(t.timestamp).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+    const card = document.createElement('div');
+    card.className = 'test-card';
+    card.innerHTML =
+      '<div class="test-nome">' + esc(t.nome) + ' ' + esc(t.cogn) + '</div>' +
+      '<div class="test-ora">📍 ' + ora + ' · 22 marzo 2026</div>' +
+      '<div class="test-testo">' + esc(t.testo).replace(/\n/g, '<br>') + '</div>' +
+      (t.foto ? '<img class="test-foto" src="' + t.foto + '" alt="Foto" loading="lazy" />' : '');
+    grid.appendChild(card);
+  });
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── ESPORTA JSON ───
+function esportaJSON() {
+  const data = localStorage.getItem(LS_KEY) || '[]';
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'testimonianze_pellegrinaggio_22mar2026.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ─── IMPORTA JSON ───
+function importaJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const importate = JSON.parse(e.target.result);
+      if (!Array.isArray(importate)) throw new Error('Formato non valido');
+      const esistenti = leggiTutte();
+      const existing_ts = new Set(esistenti.map(x => x.timestamp));
+      let nuove = 0;
+      importate.forEach(t => {
+        if (!existing_ts.has(t.timestamp)) { esistenti.push(t); nuove++; }
+      });
+      salvaTutte(esistenti);
+      aggiornaTestimonianze();
+      alert('✓ Importate ' + nuove + ' nuove testimonianze!');
+    } catch(err) {
+      alert('✗ File non valido: ' + err.message);
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ─── DATE LIMITE ───
+const MEZZANOTTE   = new Date('2026-03-23T00:00:00'); // PDF si sblocca
+const SCADENZA     = new Date('2026-04-01T00:00:00'); // Sito si chiude (dopo il 31 marzo)
+
+// ─── STATO SITO ───
+// 0 = prima del PDF  |  1 = PDF disponibile  |  2 = scaduto
+function statoSito() {
+  const now = new Date();
+  if (now >= SCADENZA)   return 2;
+  if (now >= MEZZANOTTE) return 1;
+  return 0;
+}
+
+function tick() {
+  const stato = statoSito();
+
+  if (stato === 2) {
+    // Sito scaduto — mostra overlay globale, nascondi form
+    document.getElementById('expired-overlay').style.display = 'flex';
+    document.getElementById('countdown-wrap').style.display  = 'none';
+    document.getElementById('pdf-btn-wrap').style.display    = 'none';
+    document.getElementById('pdf-expired-wrap').style.display = 'block';
+    // Blocca il form di invio
+    var btnSubmit = document.getElementById('btn-submit');
+    if (btnSubmit) { btnSubmit.disabled = true; btnSubmit.textContent = 'Raccolta chiusa — 31 marzo 2026'; }
+    return;
+  }
+
+  if (stato === 1) {
+    document.getElementById('countdown-wrap').style.display  = 'none';
+    document.getElementById('pdf-btn-wrap').style.display    = 'block';
+    document.getElementById('pdf-expired-wrap').style.display = 'none';
+    return;
+  }
+
+  // stato 0 — countdown attivo
+  document.getElementById('pdf-btn-wrap').style.display    = 'none';
+  document.getElementById('countdown-wrap').style.display  = 'block';
+  const diff = MEZZANOTTE - new Date();
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
+  document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
+  document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
+}
+setInterval(tick, 1000);
+tick();
+
+// ─── GENERA PDF (jsPDF via CDN) ───
+async function generaPDF() {
+  const btn    = document.getElementById('btn-pdf');
+  const status = document.getElementById('pdf-status');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Generazione PDF…';
+  status.textContent = '';
+  await new Promise(r => setTimeout(r, 80));
+
+  const list = leggiTutte().sort((a, b) => a.timestamp - b.timestamp);
+
+  if (!list.length) {
+    status.textContent = '✗ Nessuna testimonianza da includere.';
+    btn.disabled = false;
+    btn.innerHTML = '<span style="font-size:1.4rem">📖</span> Scarica il libro del pellegrinaggio';
+    return;
+  }
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+
+    // ── Copertina ──
+    doc.setFillColor(62,42,20);
+    doc.rect(0,0,210,297,'F');
+    doc.setDrawColor(200,136,42); doc.setLineWidth(0.5);
+    doc.rect(10,10,190,277); doc.rect(13,13,184,271);
+
+    doc.setTextColor(200,136,42); doc.setFontSize(9);
+    doc.text('COMUNITÀ PARROCCHIALE DI SAN MICHELE · AGLIANA', 105, 36, {align:'center'});
+    doc.setDrawColor(200,136,42); doc.line(40,42,170,42);
+
+    doc.setTextColor(255,255,255); doc.setFontSize(30);
+    doc.text('PELLEGRINAGGIO', 105, 78, {align:'center'});
+    doc.setTextColor(200,136,42); doc.setFontSize(18);
+    doc.text('ad Assisi', 105, 94, {align:'center'});
+
+    doc.setDrawColor(200,136,42); doc.line(50,104,160,104);
+
+    doc.setTextColor(232,200,130); doc.setFontSize(11);
+    doc.text('Sulle orme di Francesco e Carlo', 105, 116, {align:'center'});
+    doc.setTextColor(255,255,255); doc.setFontSize(10);
+    doc.text('22 Marzo 2026', 105, 129, {align:'center'});
+
+    doc.setDrawColor(200,136,42); doc.line(70,160,140,160);
+    doc.setTextColor(200,136,42); doc.setFontSize(20);
+    doc.text('Le nostre testimonianze', 105, 176, {align:'center'});
+    doc.setTextColor(255,255,255); doc.setFontSize(10);
+    doc.text(list.length + ' pellegrini', 105, 189, {align:'center'});
+
+    doc.setTextColor(80,60,40); doc.setFontSize(8);
+    doc.text('«Verso il Cielo a tutta velocità.» — San Carlo Acutis', 105, 272, {align:'center'});
+
+    // ── Pagine testimonianze ──
+    for (let i = 0; i < list.length; i++) {
+      doc.addPage();
+      const t = list[i];
+
+      // header
+      doc.setFillColor(200,136,42); doc.rect(0,0,210,14,'F');
+      doc.setTextColor(255,255,255); doc.setFontSize(7);
+      doc.text('PELLEGRINAGGIO · SAN MICHELE AGLIANA · 22 MARZO 2026', 105, 9, {align:'center'});
+
+      let y = 26;
+
+      // nome
+      doc.setTextColor(62,42,20); doc.setFontSize(20);
+      doc.text(t.nome + ' ' + t.cogn, 20, y);
+      y += 8;
+
+      // ora
+      const ora = new Date(t.timestamp).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+      doc.setTextColor(122,96,64); doc.setFontSize(8);
+      doc.text('ore ' + ora + ' · 22 marzo 2026', 20, y);
+      y += 6;
+
+      doc.setDrawColor(200,136,42); doc.setLineWidth(0.3);
+      doc.line(20, y, 190, y); y += 8;
+
+      // foto a sinistra + testo a destra, oppure solo testo
+      if (t.foto) {
+        try {
+          const imgB64 = t.foto.split(',')[1];
+          doc.addImage(imgB64, 'JPEG', 20, y, 68, 54);
+          doc.setTextColor(44,34,24); doc.setFontSize(10.5);
+          const colTxt = doc.splitTextToSize(t.testo, 95);
+          let ty = y + 2;
+          colTxt.forEach(line => {
+            if (ty < y + 54) { doc.text(line, 94, ty); ty += 6.2; }
+          });
+          y += 60;
+          // testo rimanente sotto la foto
+          const resto = colTxt.slice(Math.floor(54 / 6.2));
+          if (resto.length) { doc.text(resto, 20, y); y += resto.length * 6.2 + 6; }
+        } catch(imgErr) {
+          // foto fallita, scrivi solo testo
+          doc.setTextColor(44,34,24); doc.setFontSize(10.5);
+          const lines = doc.splitTextToSize(t.testo, 170);
+          doc.text(lines, 20, y); y += lines.length * 6.2 + 8;
+        }
+      } else {
+        doc.setTextColor(44,34,24); doc.setFontSize(10.5);
+        const lines = doc.splitTextToSize(t.testo, 170);
+        doc.text(lines, 20, y); y += lines.length * 6.2 + 8;
+      }
+
+      // footer
+      doc.setFillColor(245,239,226); doc.rect(0,285,210,12,'F');
+      doc.setTextColor(122,96,64); doc.setFontSize(7);
+      doc.text('Pellegrino ' + (i+1) + ' di ' + list.length + '  ·  pag. ' + (i+2), 105, 293, {align:'center'});
+    }
+
+    // ── Pagina finale ──
+    doc.addPage();
+    doc.setFillColor(62,42,20); doc.rect(0,0,210,297,'F');
+    doc.setDrawColor(200,136,42); doc.setLineWidth(0.5);
+    doc.rect(10,10,190,277);
+
+    doc.setTextColor(200,136,42); doc.setFontSize(15);
+    doc.text('«Il pellegrinaggio è finito.', 105, 110, {align:'center'});
+    doc.text('Il ricordo è eterno.»', 105, 126, {align:'center'});
+    doc.line(60,135,150,135);
+
+    doc.setTextColor(232,200,130); doc.setFontSize(10);
+    doc.text('Comunità di San Michele · Agliana', 105, 148, {align:'center'});
+    doc.text('22 Marzo 2026', 105, 160, {align:'center'});
+    doc.setTextColor(80,60,40); doc.setFontSize(8);
+    doc.text('Francesco d\'Assisi · Carlo Acutis', 105, 200, {align:'center'});
+
+    doc.save('pellegrinaggio-sanmichele-agliana-22marzo2026.pdf');
+    status.textContent = '✓ PDF scaricato con successo!';
+
+  } catch(err) {
+    console.error(err);
+    status.textContent = '✗ Errore nel PDF. jsPDF disponibile?';
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span style="font-size:1.4rem">📖</span> Scarica il libro del pellegrinaggio';
+}
+
+// ─── NAVIGAZIONE FLASH ───
+function flashBianco(cb) {
+  var el = document.getElementById('flash-overlay');
+  el.style.display = 'block';
+  el.style.transition = 'opacity 0.3s ease';
+  el.style.opacity = '1';
+  setTimeout(function() {
+    cb();
+    setTimeout(function() {
+      el.style.transition = 'opacity 1s ease';
+      el.style.opacity = '0';
+      setTimeout(function() { el.style.display = 'none'; }, 1100);
+    }, 200);
+  }, 350);
+}
+function scorriACarlo() {
+  flashBianco(function() {
+    window.scrollTo({ top: document.getElementById('sezione-carlo').getBoundingClientRect().top + window.pageYOffset, behavior:'smooth' });
+  });
+}
+function scorriInAlto() {
+  flashBianco(function() { window.scrollTo({ top:0, behavior:'smooth' }); });
+}
+
+// ─── AVVIO ───
+document.addEventListener('DOMContentLoaded', function() {
+  // ── Sito scaduto? bypass PIN e mostra solo overlay scadenza ──
+  if (statoSito() === 2) {
+    document.getElementById('pin-overlay').style.display  = 'none';
+    document.getElementById('expired-overlay').style.display = 'flex';
+    aggiornaTestimonianze();
+    return;
+  }
+  // ── Controlla PIN ──
+  if (!sessionStorage.getItem(PIN_LS_KEY)) {
+    document.getElementById('pin-overlay').style.display = 'flex';
+  } else {
+    document.getElementById('pin-overlay').style.display = 'none';
+  }
+  aggiornaTestimonianze();
+  setInterval(aggiornaTestimonianze, 30000);
+});
+</script>
+</body>
+</html>
